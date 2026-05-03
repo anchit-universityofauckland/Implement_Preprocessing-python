@@ -1,0 +1,61 @@
+import matplotlib.pyplot as plt
+
+# Equal frequency binning function
+def equifreq(arr1, m):    
+    a = len(arr1)
+    n = int(a / m)
+    bins = []
+    for i in range(0, m):
+        arr = []
+        for j in range(i * n, (i + 1) * n):
+            if j >= a:
+                break
+            arr = arr + [arr1[j]]
+        bins.append(arr)
+    return bins
+
+# Equal width binning function
+def equiwidth(arr1, m):
+    a = len(arr1)
+    w = int((max(arr1) - min(arr1)) / m)
+    min1 = min(arr1)
+    arr = [min1 + w * i for i in range(0, m + 1)]
+    bins = []
+    for i in range(0, m):
+        temp = [j for j in arr1 if arr[i] <= j <= arr[i + 1]]
+        bins.append(temp)
+    return bins, arr
+
+# Data to be binned
+data = [5, 10, 11, 13, 15, 35, 50, 55, 72, 92, 204, 215]
+m = 3
+
+# Perform binning
+freq_bins = equifreq(data, m)
+width_bins, width_intervals = equiwidth(data, m)
+
+# Print binning results
+print("Equal Frequency Binning:", freq_bins)
+print("\nEqual Width Binning:", width_bins)
+
+# Plotting the bins
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Equal Frequency Binning
+for i, bin_data in enumerate(freq_bins):
+    axes[0].bar([i + 1] * len(bin_data), bin_data, label=f'Bin {i+1}')
+axes[0].set_title("Equal Frequency Binning")
+axes[0].set_xlabel("Bins")
+axes[0].set_ylabel("Data Values")
+axes[0].legend()
+
+# Equal Width Binning
+for i, bin_data in enumerate(width_bins):
+    axes[1].bar([i + 1] * len(bin_data), bin_data, label=f'Bin {i+1}')
+axes[1].set_title("Equal Width Binning")
+axes[1].set_xlabel("Bins")
+axes[1].set_ylabel("Data Values")
+axes[1].legend()
+
+plt.tight_layout()
+plt.show()
