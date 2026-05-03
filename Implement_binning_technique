@@ -1,0 +1,63 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Prepare data for plotting
+num_elements = len(b)
+original_indices = np.arange(num_elements)
+original_values = b
+
+binned_mean_values = np.full(num_elements, np.nan)
+binned_boundary_values = np.full(num_elements, np.nan)
+
+for k in range(num_bins):
+    start_idx = k * bin_width
+    end_idx = min((k + 1) * bin_width, num_elements)
+    
+    # Fill the binned_mean_values and binned_boundary_values for the current bin
+    for j in range(start_idx, end_idx):
+        # The k-th row in bin1/bin2 corresponds to the k-th bin
+        # The j-start_idx column corresponds to the element within that bin
+        if j - start_idx < bin1.shape[1]: # Ensure index is within bin1/bin2's column size
+            binned_mean_values[j] = bin1[k, j - start_idx]
+            binned_boundary_values[j] = bin2[k, j - start_idx]
+
+plt.figure(figsize=(14, 7))
+
+# Plot original data
+sns.scatterplot(x=original_indices, y=original_values, s=100, label='Original Data', color='blue', zorder=5)
+
+# Plot Bin Mean
+sns.scatterplot(x=original_indices, y=binned_mean_values, s=100, label='Bin Mean (Smoothed)', color='red', marker='X', zorder=4)
+
+# Plot Bin Boundaries
+sns.scatterplot(x=original_indices, y=binned_boundary_values, s=100, label='Bin Boundaries (Assigned)', color='green', marker='o', alpha=0.7, zorder=3)
+
+# Add lines to connect original points to their binned mean/boundary for clarity
+for i in range(num_elements):
+    plt.plot([original_indices[i], original_indices[i]], [original_values[i], binned_mean_values[i]], 'r--', alpha=0.3)
+    plt.plot([original_indices[i], original_indices[i]], [original_values[i], binned_boundary_values[i]], 'g:', alpha=0.3)
+
+
+# Add vertical lines to delineate bins
+current_idx = 0
+for k in range(num_bins):
+    start_idx = k * bin_width
+    end_idx = min((k + 1) * bin_width, num_elements)
+    bin_size = end_idx - start_idx
+    if bin_size > 0:
+        # Draw a vertical line at the start of each new bin (except the very first one)
+        if k > 0:
+            plt.axvline(x=start_idx - 0.5, color='gray', linestyle='-', linewidth=1, alpha=0.7)
+        # Add text for bin number
+        mid_point_x = start_idx + (bin_size / 2) - 0.5
+        plt.text(mid_point_x, plt.ylim()[1] * 0.95, f'Bin {k+1}', horizontalalignment='center', color='darkgray', fontsize=10)
+
+
+plt.title('Comparison of Original Data, Bin Mean, and Bin Boundaries')
+plt.xlabel('Index of Element in Sorted Array `b`')
+plt.ylabel('Value')
+plt.xticks(original_indices, labels=original_values, rotation=45, ha='right')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.show()
